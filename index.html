@@ -36,6 +36,7 @@
     <input id="password-input" type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="パスワード" />
     <button id="login-btn" data-i18n="login">ログイン</button>
     <button id="register-btn" style="background:#333;" data-i18n="register">新規登録</button>
+    <div id="forgot-password" onclick="showForgotPassword()" style="color: #888; font-size: 14px; text-align: center; cursor: pointer; text-decoration: underline;">Forgot your password?</div>
     <div id="error-msg"></div>
   </div>
   <div id="register-link"><span data-i18n="haveAccount">アカウントをお持ちの方は</span> <span onclick="showLogin()" data-i18n="login">ログイン</span></div>
@@ -76,7 +77,7 @@
       messagePlaceholder: "Type a message...",
       loginError: "Login failed",
       registerError: "Registration failed: ",
-      haveAccount: "Already have an account?"
+      forgotPassword: "Forgot your password?"
     },
     ja: {
       login: "ログイン",
@@ -88,7 +89,8 @@
       messagePlaceholder: "メッセージを入力...",
       loginError: "ログインに失敗しました",
       registerError: "登録に失敗しました：",
-      haveAccount: "アカウントをお持ちの方は"
+      haveAccount: "アカウントをお持ちの方は",
+      forgotPassword: "パスワードを忘れた方"
     },
     zh: {
       login: "登录",
@@ -100,7 +102,8 @@
       messagePlaceholder: "输入消息...",
       loginError: "登录失败",
       registerError: "注册失败：",
-      haveAccount: "已有账户？"
+      haveAccount: "已有账户？",
+      forgotPassword: "忘记密码？"
     }
   };
 
@@ -190,6 +193,33 @@
     } catch (e) {
       document.getElementById("error-msg").textContent = translations[currentLang].registerError + e.message;
     }
+  };
+
+  window.showForgotPassword = function() {
+    const messages = {
+      en: "We're sorry, but it's currently not possible to reset your password. Please wait for future updates or try using a new email address.",
+      ja: "申し訳ありませんが、現在パスワードのリセットはできません。今後のアップデートをお待ちいただくか、新しいメールアドレスをご利用ください。",
+      zh: "很抱歉，目前无法重置密码。请等待未来更新或尝试使用新的电子邮箱地址。"
+    };
+    const msg = messages[currentLang] || messages.en;
+    const popup = window.open("", "forgotPassword", "width=500,height=200,left=" + (window.screenX + 100) + ",top=" + (window.screenY + 100));
+    popup.document.write(`
+      <!DOCTYPE html>
+      <html lang="${currentLang}">
+      <head>
+        <meta charset="UTF-8">
+        <title>Password Reset</title>
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { font-family: sans-serif; background: #111; color: #eee; padding: 30px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+          .message { text-align: center; line-height: 1.6; font-size: 16px; }
+        </style>
+      </head>
+      <body>
+        <div class="message">${msg}</div>
+      </body>
+      </html>
+    `);
   };
 
   window.logout = () => signOut(auth);
