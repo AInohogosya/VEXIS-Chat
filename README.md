@@ -6,7 +6,7 @@ It works in conjunction with [VEXIS-CLI-REMOTE](https://github.com/AInohogosya/V
 ## 🌐 Runtime Environment (URL)
 
 No installation is required; you can start using it right now via the link below.
-**[https://ainohogosya.github.io/VEXIS-Web/](https://ainohogosya.github.io/VEXIS-Web/)**
+**[https://ainohogosya.github.io/VEXIS-Web/](https://ainohogosya.github.io/VEXIS-Chat/)**
 
 ---
 
@@ -15,7 +15,7 @@ No installation is required; you can start using it right now via the link below
 1.  **Start the Backend**
     Clone [VEXIS-CLI-REMOTE](https://github.com/AInohogosya/VEXIS-CLI-REMOTE)—the main component that receives instructions—complete the setup, and start it.
 2.  **Access the Website**
-    Open [VEXIS-Web](https://ainohogosya.github.io/VEXIS-Web/) in your browser.
+    Open [VEXIS-Web](https://ainohogosya.github.io/VEXIS-Chat/) in your browser.
 3.  **Issuing Instructions to the Agent**
     Send instructions to the AI agent using the input form on the screen.
 
@@ -37,10 +37,10 @@ Follow the steps below if you wish to customize the repository or build it local
 
 ```bash
 # Clone the repository
-git clone [https://github.com/AInohogosya/VEXIS-Web.git](https://github.com/AInohogosya/VEXIS-Web.git)
+git clone [https://github.com/AInohogosya/VEXIS-Web.git](https://github.com/AInohogosya/VEXIS-Chat.git)
 
 # Change to the directory
-cd VEXIS-Web
+cd VEXIS-Chat
 
 # Install dependencies
 npm install
@@ -49,6 +49,6 @@ npm install
 npm run dev
 ```
 🔗 Links
-GitHub Pages: https://ainohogosya.github.io/VEXIS-Web/
+GitHub Pages: https://ainohogosya.github.io/VEXIS-Chat/
 
 Backend Repository: VEXIS-CLI-REMOTE
