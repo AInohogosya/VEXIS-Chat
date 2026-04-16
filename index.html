@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VEXIS Chat</title>
+  <title>VEXIS-Chat</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
@@ -95,10 +95,6 @@
       gap: 8px;
     }
     
-    #header-left span::before {
-      content: '🤖';
-      font-size: 20px;
-    }
     
     #header button {
       background: var(--surface-hover);
@@ -256,10 +252,6 @@
       transform: translateY(0);
     }
     
-    #send::before {
-      content: '➤';
-      font-size: 12px;
-    }
     
     #send:disabled {
       opacity: 0.6;
@@ -648,7 +640,7 @@
 <body>
 
 <div id="login-screen">
-  <h1>VEXIS Chat</h1>
+  <h1>VEXIS-Chat</h1>
   <div id="login-form">
     <input id="email-input" type="email" data-i18n-placeholder="emailPlaceholder" placeholder="メールアドレス" />
     <input id="password-input" type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="パスワード" />
@@ -662,7 +654,7 @@
 <div id="chat-screen" style="display:none; flex-direction:column; height:100dvh;">
   <div id="header">
     <div id="header-left">
-      <span>VEXIS Agent</span>
+      <span>VEXIS-Chat</span>
       <select id="lang-selector">
         <option value="en">English</option>
         <option value="ja">日本語</option>
@@ -674,7 +666,6 @@
   <div id="messages"></div>
   <div id="copy-menu" class="copy-menu">
     <button onclick="copyMessage()">
-      <span>📋</span>
       <span data-i18n="copy">Copy</span>
     </button>
   </div>
@@ -1037,7 +1028,7 @@
         // Show brief success feedback
         const copyBtn = document.querySelector('#copy-menu button');
         const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<span>✓</span><span>Copied!</span>';
+        copyBtn.textContent = 'Copied!';
         setTimeout(() => {
           copyBtn.innerHTML = originalText;
           hideCopyMenu();
