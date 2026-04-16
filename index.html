@@ -587,6 +587,62 @@
     * {
       transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
+    
+    /* Long-press zoom effect */
+    .msg.long-pressed {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+    
+    /* Copy menu */
+    .copy-menu {
+      position: fixed;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      display: none;
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    .copy-menu.show {
+      display: block;
+    }
+    
+    .copy-menu button {
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .copy-menu button:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
   </style>
 </head>
 <body>
@@ -616,6 +672,12 @@
     <button onclick="logout()" data-i18n="logout">ログアウト</button>
   </div>
   <div id="messages"></div>
+  <div id="copy-menu" class="copy-menu">
+    <button onclick="copyMessage()">
+      <span>📋</span>
+      <span data-i18n="copy">Copy</span>
+    </button>
+  </div>
   <div id="input-area">
     <input id="input" type="text" data-i18n-placeholder="messagePlaceholder" placeholder="メッセージを入力..." />
     <button id="send" data-i18n="send">送信</button>
@@ -638,7 +700,8 @@
       messagePlaceholder: "Type a message...",
       loginError: "Login failed",
       registerError: "Registration failed: ",
-      forgotPassword: "Forgot your password?"
+      forgotPassword: "Forgot your password?",
+      copy: "Copy"
     },
     ja: {
       login: "ログイン",
@@ -650,7 +713,8 @@
       messagePlaceholder: "メッセージを入力...",
       loginError: "ログインに失敗しました",
       registerError: "登録に失敗しました：",
-      forgotPassword: "パスワードを忘れた方"
+      forgotPassword: "パスワードを忘れた方",
+      copy: "コピー"
     },
     zh: {
       login: "登录",
@@ -662,12 +726,16 @@
       messagePlaceholder: "输入消息...",
       loginError: "登录失败",
       registerError: "注册失败：",
-      forgotPassword: "忘记密码？"
+      forgotPassword: "忘记密码？",
+      copy: "复制"
     }
   };
 
   let currentLang = 'en';
   let unsubscribe = null;
+  let longPressTimer = null;
+  let currentMessageElement = null;
+  let messageToCopy = null;
 
   function detectBrowserLanguage() {
     const browserLang = navigator.language || navigator.userLanguage;
@@ -858,6 +926,15 @@
         
         msgDiv.appendChild(contentWrapper);
         msgDiv.appendChild(timestamp);
+        
+        // Add long-press event listeners
+        msgDiv.addEventListener('touchstart', handleLongPressStart);
+        msgDiv.addEventListener('touchend', handleLongPressEnd);
+        msgDiv.addEventListener('touchmove', handleLongPressCancel);
+        msgDiv.addEventListener('mousedown', handleLongPressStart);
+        msgDiv.addEventListener('mouseup', handleLongPressEnd);
+        msgDiv.addEventListener('mouseleave', handleLongPressCancel);
+        
         container.appendChild(msgDiv);
       });
       
@@ -896,6 +973,89 @@
       indicator.remove();
     }
   }
+  
+  function handleLongPressStart(e) {
+    // Only trigger on left mouse button or touch
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    
+    currentMessageElement = e.currentTarget;
+    messageToCopy = currentMessageElement.querySelector('.message-timestamp').previousElementSibling.textContent;
+    
+    longPressTimer = setTimeout(() => {
+      currentMessageElement.classList.add('long-pressed');
+      showCopyMenu(e);
+    }, 500);
+  }
+  
+  function handleLongPressEnd(e) {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  }
+  
+  function handleLongPressCancel() {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    if (currentMessageElement) {
+      currentMessageElement.classList.remove('long-pressed');
+    }
+    hideCopyMenu();
+  }
+  
+  function showCopyMenu(e) {
+    const copyMenu = document.getElementById('copy-menu');
+    
+    let x, y;
+    if (e.type === 'touchstart') {
+      const touch = e.touches[0];
+      x = touch.clientX;
+      y = touch.clientY;
+    } else {
+      x = e.clientX;
+      y = e.clientY;
+    }
+    
+    copyMenu.style.left = `${x}px`;
+    copyMenu.style.top = `${y}px`;
+    copyMenu.classList.add('show');
+  }
+  
+  function hideCopyMenu() {
+    const copyMenu = document.getElementById('copy-menu');
+    copyMenu.classList.remove('show');
+    if (currentMessageElement) {
+      currentMessageElement.classList.remove('long-pressed');
+    }
+  }
+  
+  window.copyMessage = function() {
+    if (messageToCopy) {
+      navigator.clipboard.writeText(messageToCopy).then(() => {
+        // Show brief success feedback
+        const copyBtn = document.querySelector('#copy-menu button');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span>✓</span><span>Copied!</span>';
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+          hideCopyMenu();
+        }, 1000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+    hideCopyMenu();
+  };
+  
+  // Hide copy menu when clicking outside
+  document.addEventListener('click', (e) => {
+    const copyMenu = document.getElementById('copy-menu');
+    if (!copyMenu.contains(e.target) && !e.target.closest('.msg')) {
+      hideCopyMenu();
+    }
+  });
 </script>
 </body>
 </html>
